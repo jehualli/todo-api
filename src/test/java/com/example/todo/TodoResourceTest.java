@@ -67,11 +67,17 @@ class TodoResourceTest {
 
         given()
                 .when()
-                .get("/api/todos?completed=false&q=tests")
+                .get("/api/todos?completed=false&q=tests&page=0&size=10&sort=title&direction=asc")
                 .then()
                 .statusCode(200)
-                .body("$", hasSize(1))
-                .body("[0].id", equalTo(id));
+                .body("items", hasSize(1))
+                .body("items[0].id", equalTo(id))
+                .body("page", equalTo(0))
+                .body("size", equalTo(10))
+                .body("totalItems", equalTo(1))
+                .body("totalPages", equalTo(1))
+                .body("first", equalTo(true))
+                .body("last", equalTo(true));
 
         given()
                 .contentType("application/json")
@@ -112,7 +118,9 @@ class TodoResourceTest {
                 .when()
                 .get("/api/todos/{id}", id)
                 .then()
-                .statusCode(404);
+                .statusCode(404)
+                .body("error", equalTo("NOT_FOUND"))
+                .body("status", equalTo(404));
     }
 
     @Test
@@ -127,6 +135,20 @@ class TodoResourceTest {
                 .when()
                 .post("/api/todos")
                 .then()
-                .statusCode(400);
+                .statusCode(400)
+                .body("error", equalTo("VALIDATION_ERROR"))
+                .body("fields", hasSize(1))
+                .body("fields[0].field", equalTo("title"));
+    }
+
+    @Test
+    void rejectsInvalidPagination() {
+        given()
+                .when()
+                .get("/api/todos?page=-1")
+                .then()
+                .statusCode(400)
+                .body("error", equalTo("BAD_REQUEST"))
+                .body("message", equalTo("page must be greater than or equal to 0"));
     }
 }

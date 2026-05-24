@@ -43,12 +43,39 @@ Defaults are set in `src/main/resources/application.properties`.
 
 | Method | Path | Description |
 | --- | --- | --- |
-| `GET` | `/api/todos` | List todos. Optional query params: `completed`, `q` |
+| `GET` | `/api/todos` | List todos. Optional query params: `completed`, `q`, `page`, `size`, `sort`, `direction` |
 | `GET` | `/api/todos/{id}` | Get one todo |
 | `POST` | `/api/todos` | Create a todo |
 | `PUT` | `/api/todos/{id}` | Replace a todo |
 | `PATCH` | `/api/todos/{id}/complete` | Update completion status |
 | `DELETE` | `/api/todos/{id}` | Delete a todo |
+
+List responses are paginated:
+
+```json
+{
+  "items": [],
+  "page": 0,
+  "size": 20,
+  "totalItems": 0,
+  "totalPages": 0,
+  "first": true,
+  "last": true
+}
+```
+
+Errors use a consistent JSON shape:
+
+```json
+{
+  "error": "BAD_REQUEST",
+  "message": "size must be between 1 and 100",
+  "status": 400,
+  "path": "api/todos",
+  "timestamp": "2026-05-23T02:36:40Z",
+  "fields": []
+}
+```
 
 ## Example Requests
 
